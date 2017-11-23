@@ -180,7 +180,7 @@ if True:
     time(lambda: x.minute, "Arrow.minute")
 
     x = pendulum.now("America/New_York")
-    time(lambda: x.minute, "Arrow.minute")
+    time(lambda: x.minute, "Pendulum.minute")
 
     x = cron.now()
     z = cron.TimeZone("America/New_York")
