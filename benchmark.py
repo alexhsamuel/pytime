@@ -33,10 +33,11 @@ def time(fn, label, samples=20, n=5000, quantile=0.05, unit=None):
     elapsed -= null
     print("{:6.2f} µs ".format(elapsed / n / 1E-6), end="")
     if unit is None:
-        print("         ", end="")
+        print("        ", end="")
+    elif unit is True:
+        print("=  1    ", end="")
     else:
-        mult = 1 if unit is True else elapsed / unit
-        print("= {:5.2f}  ".format(mult), end="")
+        print("= {:4.1f}  ".format(elapsed / unit), end="")
     print(label)
     return elapsed
 
@@ -176,9 +177,7 @@ if True:
 if True:
     print("get minute of local time")
 
-    def none():
-        pass
-    time(lambda: none(), "null")
+    time(lambda: None, "null")
     
     z = pytz.timezone("America/New_York")
     x = z.localize(datetime.now())
@@ -192,6 +191,9 @@ if True:
 
     x = pendulum.now("America/New_York")
     time(lambda: x.minute, "Pendulum.minute", unit=u)
+
+    x = pd.Timestamp.now("America/New_York")
+    time(lambda: x.minute, "Timestamp.minute", unit=u)
 
     x = cron.now()
     z = cron.TimeZone("America/New_York")
