@@ -42,6 +42,10 @@ def time(fn, label, samples=20, n=5000, quantile=0.05, unit=None):
     return elapsed
 
 
+def none():
+    pass
+
+
 #-------------------------------------------------------------------------------
 
 if True:
@@ -71,8 +75,6 @@ if True:
 if True:
     print("convert time to string")
 
-    def none():
-        pass
     time(lambda: none(), "null")
 
     x = datetime.utcnow()
@@ -112,8 +114,6 @@ if True:
 if True:
     print("convert from one time zone to another")
 
-    def none():
-        pass
     time(lambda: none(), "null")
     
     z0 = pytz.timezone("America/New_York")
@@ -200,5 +200,35 @@ if True:
     time(lambda: (x @ z).daytime.minute, "cron @ .daytime.minute", unit=u)
 
     print()
+
+
+if True:
+    print("parse UTC time")
+    s = '2017-11-23T19:11:00.080593Z'
+    fmt = "%Y-%m-%dT%H:%M:%S.%fZ"
+
+    f = datetime.strptime
+    u = time(lambda: f(s, fmt), "datetime.strptime")
+
+    f = udatetime.from_string
+    time(lambda: f(s), "udatetime.from_string", unit=u)
+
+    f = delorean.parse
+    time(lambda: f(s), "delorean.parse", unit=u)
+
+    f = arrow.get
+    time(lambda: f(s), "arrow.get", unit=u)
+
+    f = pendulum.from_format
+    time(lambda: f(s, fmt), "pendulum.from_format", unit=u)
+
+    f = pendulum.strptime
+    time(lambda: f(s, fmt), "pendulum.strptime", unit=u)
+
+    f = pendulum.parse
+    time(lambda: f(s), "pendulum.parse", unit=u)
+
+    print()
+
 
 
