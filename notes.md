@@ -75,7 +75,9 @@
 - delorean 0.6.0 (pip)
 - arrow 0.10.0 (conda)
 - pendulum 1.3.2 (pip)
-  - uses pytzdata 2017.3.1 (pip)
+- pytzdata 2017.3.1 (pip) for pendulum
+- babel 2.5.0 (conda) for delorean
+- tzlocal 1.2 (pip) for delorean
 
 
 # Exercises
