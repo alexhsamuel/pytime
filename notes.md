@@ -40,14 +40,13 @@
 
 ## Features
 
-- date
 - time
-- time of day
+- date, time of day
 - time zones
   - data source
   - how recent?
-    - macOS 10.12.6 `/usr/share/zoneinfo` is 2017b
-    - Ubuntu 17.04 `/usr/share/zoneinfo` is 2017b
+    - macOS 10.12.6 `/usr/share/zoneinfo` is 2017b (see +VERSION)
+    - Ubuntu 17.04 `/usr/share/zoneinfo` is 2017b (tzdata package)
 - date arithmetic
 - time arithmetic
 - parsing and formatting
@@ -69,7 +68,7 @@
 
 - conda
 - Python 3.6.3 (conda)
-- dateutil 2.6.1 (pip)
+- dateutil 2.6.1 (conda "python-dateutil")
 - pytz 2017.2 (conda)
 - udatetime 0.0.13 (pip)
 - delorean 0.6.0 (pip)
