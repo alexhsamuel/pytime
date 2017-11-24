@@ -1,4 +1,106 @@
+# Preliminaries
+
+
+## Time
+
+Time at its core is conceptually fairly simple.  It's kind of like space, except
+one dimension instead of three, and history proceeds&mdash;basically by
+definition&mdash;monotonically in one direction.
+
+
+## Date
+
+Date is a much more complicated, human concept.  We divide time into recurring
+periods of 24 hours (usually), and represent a time by specifying which day
+period (the date) and how far into this day (the time of day, or sometimes just
+"time" for short).
+
+
+## Time zones
+
+To complicate things further, we don't agree on when each day starts.  Each
+government is free to specify this for its territory or subterritories, and to
+change this at its leisure.  A government will generally specify this to
+coordinate the time of day with the rising and setting of the sun in its
+territory.  A geographical region with a consistent association of time to date
+and time of day is a "time zone".  
+
+Many governments modify the associations over the year for social or economic
+policy; this is "daylight savings time" (DST).
+
+The mapping between time and (date, time of day) is a political creation and not
+tied to any physical reality.  As such, the past, current, and projected future
+mapping needs to be encoded as data, and this data needs to be updated whenever
+governments change their minds.  
+
+Basically all systems uses the "Olson" [time zone
+database](https://en.wikipedia.org/wiki/Tz_database) as the source of this
+information.  On UNIX/Linux/macOS systems, it's generally installed in
+`/usr/share/zoneinfo`.
+
+In the past, some systems did not include up-to-date copies of the database,
+though it seems nowadays mostly up-to-date.  At the time of writing, Ubuntu
+17.04 and macOS 10.12.6 both provide the "2017b" version; the latest version is
+"2017c".
+
+FIXME: Windows
+
+### UTC
+
+UTC is sort of a time zone associated with no territory.  It provides a
+non-varying association between physical time and (date, time of day), and is
+the reference against which other time zones are specified.
+
+### Naming
+
+Time zones in the time zone database are named by major cities or other
+geographical features contained in them, for example "America/New_York",
+"Europe/London", and "Asia/Tokyo".  The time zone database is just a directory
+with one file (or symlink) for each zone, so poke around to see what's there.
+
+Usually you don't want to use EST and EDT as a time zone; each is honored in the
+Eastern U.S. for only half the year.  The combined time zone is "Eastern time",
+specified as "US/Eastern" or "America/New_York" in the time zone database.
+
+Avoid using GMT (Greenwhich Mean Time) as a synonym for UTC; it's not quite the
+same thing.  Among other things, GMT is wintertime part of the United Kingdom's
+time zone.  UK is on GMT in the winter and BST (British Summer Time) in the
+summer, just as the U.S. Eastern time zone is on EST in the winter and EDT in
+the summer.
+
+
 # The packages
+
+## dateutil
+
+`dateutil.tz` provides an implementation of `tzinfo` that, by default, uses
+your system's copy of the Olson time zone database.
+
+`dateutil.zoneinfo` uses its own copy of the database (2017b in the PyPI/conda
+2.6.1 package).
+
+
+## pytz
+
+pytz combines a copy of the Olson time zone database with an implemntation of
+`tzinfo` built on top of it.  
+
+**A pytz time zone object needs to be used properly in order to produce correct
+results.**  This code does _not do the right thing_:
+
+```py
+tz = pytz.timezone("America/New_York")
+t = datetime(2017, 11, 23, 15, 16, 46, tzinfo=tz)   # WRONG!
+```
+
+Intead, you _must_ use the time zone's `localize()` method to convert from
+a naive to an aware datetime.
+
+```py
+tz = pytz.timezone("America/New_York")
+t = tz.localize(datetime(2071, 11, 23, 15, 16, 46))  # right
+```
+
 
 ## Delorean
 
