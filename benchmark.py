@@ -208,7 +208,7 @@ if True:
     fmt = "%Y-%m-%dT%H:%M:%S.%fZ"
 
     f = datetime.strptime
-    u = time(lambda: f(s, fmt), "datetime.strptime")
+    u = time(lambda: f(s, fmt), "datetime.strptime", unit=True)
 
     f = udatetime.from_string
     time(lambda: f(s), "udatetime.from_string", unit=u)
