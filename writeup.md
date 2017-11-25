@@ -69,6 +69,42 @@ summer, just as the U.S. Eastern time zone is on EST in the winter and EDT in
 the summer.
 
 
+# Primitive representations
+
+Several _ad hoc_ representations are widely used for times and dates.
+
+1. Stringified dates and times, for example "2017-11-25" and "2017-11-25
+   10:29:46.531286-05:00".  Two major advantages: these are easy for humans to
+   read and write, and essentially any language, framework, and format
+   (particularly: CSV, JSON, XML) can represent them.  
+
+   The major disadvantage is that no time/date operations are naturally
+   available, e.g. "2017-12-31" + 1 day.  
+
+2. Dates and times stringified without punctuation and re-encoded in integers,
+   _e.g._ 20171127 (today), 123000 (lunchtime).  These too can be represented in
+   most systems, but operations are similarly unavailable.
+
+3. Dates represented as dates since a specific "epoch" date, and times
+   represented as ticks (seconds, or afixed fractions of a second) since a
+   specific "epoch" instant.  On UNIX, traditional epoch is
+   1970-01-01T00:00:00+00:00.
+
+The first two have the advantages of being readily interpreted in human-friendly
+time units (year, month, day, hour, minute, second).  Further, all languages,
+frameworks, and formats (such as JSON, XML, and CSV) can represent them.
+However, few operations are available; for example, adding a day to a date
+correctly is not possible.  
+
+The third representation, days or ticks since an epoch, is the opposite.  Date
+and time operations are just ordinary additions and subtractions; however it's
+not possible to extract human-friendly units or format dates and times for
+humans.
+
+Various time and date packages exist to bridge this feature gap: to provide
+human-friendly representations that also support temporal operations.
+
+
 # The packages
 
 ## dateutil
@@ -114,6 +150,12 @@ for parsing.
 
 
 
+## Arrow
+
+Has its own from-scratch localization implementation, with support for about 50
+languages.
+
+
 ## Pandas
 
 Uses `datetime64` arrays, but scalars exposed as `pandas.Timestamp` 
@@ -138,6 +180,47 @@ Timestamp('2017-11-21 22:21:26.994301')
 >>> ser.values[0]
 numpy.datetime64('2017-11-21T22:21:26.994301000')
 ```
+
+
+# Recommentations
+
+- Choose consistent time and date reperesentations.
+
+  If you have no need for performing temporal operations, and just need to store
+  and retrieve them, stringified representations are fine.  Otherwise, choose
+  the library that best meets your project's feature and performance needs, and
+  use it consistently throughout.
+
+  - For ease of use, Pendulum and Arrow are good choices.
+
+  - For performance and compatibility, use `datetime` and `pytz`, with
+    `dateutil` for additional functionality if you need it.
+
+  - If you use numpy heavily, `datetime64` is the obvious choice, though you
+    will find the features to be lacking.
+
+  - If you use Pandas, `Timestamp` will provide most of the features you need.
+    You may need additional libraries for special uses.
+
+- Prefer UTC for stored times.
+
+  Store UTC times whenever you wish to represent when an event happened, for
+  example timestamps of log events or transactions.  
+
+- Use RFC 3339 formatting.
+
+  The point of standards is that everyone should use them, despite personal
+  preference.  This makes life easier for everyone.
+
+- Use localized times in UIs.
+
+  Nontechnical users expect localized times formatted
+
+- Learn how to use `datetime`, even if it's not your primary representation.
+
+  This is the _lingua franca_ for date and time representations in Python,
+  supported by nearly every library and framework that needs them, e.g. APIs,
+  database drivers, and formatting tools.
 
 
 # Appendices
@@ -167,4 +250,5 @@ I've run the benchmarks on my laptop (late 2013 MacBook Pro, 2.4 GHz i5, macOS
 10.12.6) and a bare metal Linux desktop (Ubuntu 17.04, 3.5 GHz i7-3770K, kernel
 4.10.0-24-lowlatency).  While results differ considerably, I find ratios among
 different implementations of the same operations to be roughly comparable.
+
 
