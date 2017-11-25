@@ -184,21 +184,26 @@ numpy.datetime64('2017-11-21T22:21:26.994301000')
 
 # Feature matrix
 
-|                           |datetime|Delorean|Arrow   |Pendulum|numpy   |Pandas  |
-|---------------------------|:------:|:------:|:------:|:------:|:------:|:------:|
-|naive time                 |✔       |?       |?       |?       |?       |?       |
-|localized time             |✔       |?       |?       |?       |?       |?       |
-|date                       |✔       |?       |?       |?       |?       |?       |
-|time of day                |✔       |?       |?       |?       |?       |?       |
-|time range                 |1-9999  |?       |?       |?       |?       |?       |
-|date range                 |1-9999  |?       |?       |?       |?       |?       |
-|time resolution            |1 µs    |1 µs    |1 µs    |1 µs    |1 ns    |1 ns    |
-|rounding                   |        |?       |?       |?       |?       |?       |
-|locales                    |        |?       |?       |?       |?       |?       |
-|humanizing                 |        |?       |?       |?       |?       |?       |
-|TEMPLATE                   |?       |?       |?       |?       |?       |?       |
+|                   |datetime|Delorean|Arrow   |Pendulum|numpy[1]|Pandas  |
+|-------------------|:------:|:------:|:------:|:------:|:------:|:------:|
+|naive time         |✔       |✘       |?       |?       |✔       |?       |
+|localized time     |✔       |✔       |?       |?       |✘       |?       |
+|date               |✔       |✘       |?       |?       |✔       |?       |
+|time of day        |✔       |✘       |?       |?       |✘       |?       |
+|time range         |1-9999  |1-9999  |?       |?       |1678-2262|?       |
+|time resolution    |1 µs    |1 µs    |1 µs    |1 µs    |1 ns    |1 ns    |
+|date range         |1-9999  |        |?       |?       |huge    |?       |
+|rounding           |        |✔       |?       |?       |✘       |?       |
+|parsing            |strptime|smart   |?       |?       |limited |?       |
+|formatting         |strftime|✘       |?       |?       |✘       |?       |
+|locales            |        |✘       |?       |?       |✘       |?       |
+|humanizing         |        |✔       |?       |?       |✘       |?       |
+|implementation     |C       |Python  |Python  |Python  |C       |Cython  |
+|interal repr       |components|`datetime`|`datetime`|`datetime`|ticks|datetime+ns|
 
-For numpy, we consider "datetime64[ns]" for times and "datetime64[D]" for dates.
+|TEMPLATE           |?       |?       |?       |?       |?       |?       |
+
+[1] For numpy, we consider "datetime64[ns]" for times and "datetime64[D]" for dates.
 
 
 # Recommentations
