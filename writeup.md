@@ -148,9 +148,119 @@ formatting.
 Uses [`dateutil.parser`](http://dateutil.readthedocs.io/en/stable/parser.html)
 for parsing.
 
+Uses [Babel]() for formatting and humanizing.  Babel doesn't use the POSIX
+strftime pattern syntax; it has [its own format specification](summer, just as the U.S. Eastern time zone is on EST in the winter and EDT in
+the summer.
+
+
+# Primitive representations
+
+Several _ad hoc_ representations are widely used for times and dates.
+
+1. Stringified dates and times, for example "2017-11-25" and "2017-11-25
+   10:29:46.531286-05:00".  Two major advantages: these are easy for humans to
+   read and write, and essentially any language, framework, and format
+   (particularly: CSV, JSON, XML) can represent them.  
+
+   The major disadvantage is that no time/date operations are naturally
+   available, e.g. "2017-12-31" + 1 day.  
+
+2. Dates and times stringified without punctuation and re-encoded in integers,
+   _e.g._ 20171127 (today), 123000 (lunchtime).  These too can be represented in
+   most systems, but operations are similarly unavailable.
+
+3. Dates represented as dates since a specific "epoch" date, and times
+   represented as ticks (seconds, or afixed fractions of a second) since a
+   specific "epoch" instant.  On UNIX, traditional epoch is
+   1970-01-01T00:00:00+00:00.
+
+The first two have the advantages of being readily interpreted in human-friendly
+time units (year, month, day, hour, minute, second).  Further, all languages,
+frameworks, and formats (such as JSON, XML, and CSV) can represent them.
+However, few operations are available; for example, adding a day to a date
+correctly is not possible.  
+
+The third representation, days or ticks since an epoch, is the opposite.  Date
+and time operations are just ordinary additions and subtractions; however it's
+not possible to extract human-friendly units or format dates and times for
+humans.
+
+Various time and date packages exist to bridge this feature gap: to provide
+human-friendly representations that also support temporal operations.
+
+
+# The packages
+
+## dateutil
+
+`dateutil.tz` provides an implementation of `tzinfo` that, by default, uses
+your system's copy of the Olson time zone database.
+
+`dateutil.zoneinfo` uses its own copy of the database (2017b in the PyPI/conda
+2.6.1 package).
+
+
+## pytz
+
+pytz combines a copy of the Olson time zone database with an implemntation of
+`tzinfo` built on top of it.  
+
+**A pytz time zone object needs to be used properly in order to produce correct
+results.**  This code does _not do the right thing_:
+
+```py
+tz = pytz.timezone("America/New_York")
+t = datetime(2017, 11, 23, 15, 16, 46, tzinfo=tz)   # WRONG!
+```
+
+Intead, you _must_ use the time zone's `localize()` method to convert from
+a naive to an aware datetime.
+
+```py
+tz = pytz.timezone("America/New_York")
+t = tz.localize(datetime(2071, 11, 23, 15, 16, 46))  # right
+```
+
+
+## Delorean
+
+The `delorean` package provides a `Delorean` time type, implemented in Python,
+that wraps `datetime` to provide a more convenient API.  Only localized times
+are supported; naive times and dates are not.
+
+Delorean uses pytz for time zones, and allows you to specify the time zone by
+name in its APIs.
+
+```py
+>>> Delorean(timezone="Africa/Timbuktu")
+Delorean(datetime=datetime.datetime(2017, 11, 25, 22, 28, 31, 394419), timezone='Africa/Timbuktu')
+```
+
+Delorean uses
+[`dateutil.parser`](http://dateutil.readthedocs.io/en/stable/parser.html) for
+parsing.  It's reasonably smart and can guess the time format in many cases.
+
+Delorean doesn't support any Python `format()` specifiers at all, but does
+provide a `format_datetime()` method based on the
+[Babel](http://babel.pocoo.org/en/latest/index.html) localiztion library.  Babel
+doesn't use the POSIX strftime pattern syntax; instead, it has its own [pattern
+synxtax](http://babel.pocoo.org/en/latest/dates.html#pattern-syntax).
+
+```py
+>>> d.format_datetime("YYYY-MM-dd hh:mm:ssZZ")
+'2017-11-25 05:25:07-0500'
+```
+
+Delorean also builds in an interface to the
+[humanize](https://pypi.python.org/pypi/humanize) library, for converting times
+to human-friendly descriptions like "an hour ago".
+
 
 
 ## Arrow
+
+The `arrow` package provides an `Arrow` time type, implemented in Python, that
+wraps the `datetime` type to provide a more convenient API.
 
 Has its own from-scratch localization implementation, with support for about 50
 languages.
@@ -186,24 +296,25 @@ numpy.datetime64('2017-11-21T22:21:26.994301000')
 
 |                   |datetime|Delorean|Arrow   |Pendulum|numpy[1]|Pandas  |
 |-------------------|:------:|:------:|:------:|:------:|:------:|:------:|
-|naive time         |✔       |✘       |?       |?       |✔       |?       |
-|localized time     |✔       |✔       |?       |?       |✘       |?       |
-|date               |✔       |✘       |?       |?       |✔       |?       |
-|time of day        |✔       |✘       |?       |?       |✘       |?       |
-|time range         |1-9999  |1-9999  |?       |?       |1678-2262|?       |
+|naive time         |✔       |✘       |✘       |?       |✔       |?       |
+|localized time     |✔       |✔       |✔       |?       |✘       |?       |
+|date               |✔       |✘       |✘       |?       |✔       |?       |
+|time of day        |✔       |✘       |✘       |?       |✘       |?       |
+|time range         |1-9999  |1-9999  |1-9999  |?       |1678-2262|?       |
 |time resolution    |1 µs    |1 µs    |1 µs    |1 µs    |1 ns    |1 ns    |
-|date range         |1-9999  |        |?       |?       |huge    |?       |
-|rounding           |        |✔       |?       |?       |✘       |?       |
-|parsing            |strptime|smart   |?       |?       |limited |?       |
-|formatting         |strftime|✘       |?       |?       |✘       |?       |
-|locales            |        |✘       |?       |?       |✘       |?       |
-|humanizing         |        |✔       |?       |?       |✘       |?       |
+|date range         |1-9999  |        |        |?       |huge    |?       |
+|rounding           |✘       |✔       |✔       |?       |✘       |?       |
+|parsing            |strptime|udatetime|custom[2]|?       |limited |?       |
+|formatting         |strftime|Babel   |custom  |?       |✘       |?       |
+|locales            |✘       |✘       |custom  |?       |✘       |?       |
+|humanizing         |✘       |✔       |✔       |?       |✘       |?       |
 |implementation     |C       |Python  |Python  |Python  |C       |Cython  |
-|interal repr       |components|`datetime`|`datetime`|`datetime`|ticks|datetime+ns|
+|interal repr       |components|`datetime`|`datetime`|`datetime`|ticks|`datetime`+ns|
 
 |TEMPLATE           |?       |?       |?       |?       |?       |?       |
 
 [1] For numpy, we consider "datetime64[ns]" for times and "datetime64[D]" for dates.
+[2] Arrow also supports strptime-style parsing.
 
 
 # Recommentations
@@ -229,17 +340,23 @@ numpy.datetime64('2017-11-21T22:21:26.994301000')
 - Prefer UTC for stored times.
 
   Store UTC times whenever you wish to represent when an event happened, for
-  example timestamps of log events or transactions.  
+  example timestamps of log events or transactions.
+
+- Use localized time objects.
+
+  In almost all cases, use explicitly localized times.  If the entire
+  application uses UTC only, and never converts to other time zones, this is
+  optional, but still recommended for clarity.
 
 - Use RFC 3339 formatting.
 
   The point of standards is that everyone should use them, despite personal
   preference.  This makes life easier for everyone.
 
-- Use localized times in UIs.
+- Use time zone- and locale-aware times in UIs.
 
-  Nontechnical users expect localized times formatted to their language- and
-  culture-specific conventions.
+  Nontechnical users expect localized times presented in their local time zones
+  and formatted to their language- and culture-specific conventions.
 
 - Don't use times to represent dates.
 
