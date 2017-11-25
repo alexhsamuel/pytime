@@ -294,7 +294,7 @@ numpy.datetime64('2017-11-21T22:21:26.994301000')
 
 # Feature matrix
 
-|                   |datetime|Delorean|Arrow   |Pendulum|numpy[1]|Pandas  |
+|                   |datetime|Delorean|Arrow   |Pendulum|numpy<sup>1</sup>|Pandas  |
 |-------------------|:------:|:------:|:------:|:------:|:------:|:------:|
 |naive time         |✔       |✘       |✘       |?       |✔       |?       |
 |localized time     |✔       |✔       |✔       |?       |✘       |?       |
@@ -308,14 +308,19 @@ numpy.datetime64('2017-11-21T22:21:26.994301000')
 |formatting         |strftime|Babel   |custom  |?       |✘       |?       |
 |locales            |✘       |✘       |custom  |?       |✘       |?       |
 |humanizing         |✘       |✔       |✔       |?       |✘       |?       |
+|approx mem (bytes) |40      |220     |512     |448     |8<sup>3</sup>|8<sup>3</sup>|
 |implementation     |C       |Python  |Python  |Python  |C       |Cython  |
 |interal repr       |components|`datetime`|`datetime`|`datetime`|ticks|`datetime`+ns|
 
 |TEMPLATE           |?       |?       |?       |?       |?       |?       |
 
-[1] For numpy, we consider "datetime64[ns]" for times and "datetime64[D]" for dates.
+<sup>1</sup> For numpy, we consider "datetime64[ns]" for times and "datetime64[D]" for dates.
 
 <sup>2</sup> Arrow also supports strptime-style parsing.
+
+<sup>3</sup> A `datetime64` takes 8 bytes in an ndarray, but substantially more
+as a freestanding object.  Similarly, a `pandas.Timestamp` takes 8 bytes in an
+index, series, or dataframe, but substantially more as a freestanding object.
 
 
 # Recommentations
@@ -410,4 +415,21 @@ I've run the benchmarks on my laptop (late 2013 MacBook Pro, 2.4 GHz i5, macOS
 4.10.0-24-lowlatency).  While results differ considerably, I find ratios among
 different implementations of the same operations to be roughly comparable.
 
+
+## Memory use methodology
+
+Computing the amount of memory used by Python objects is tricky.  Besides the
+instance itself, the object may carry a `__dict__` as well as attribute values.
+However, some of these attribute values may be shared singletons, such as small
+integers and time zone instances.
+
+I measure memory use under the assumption that this question is interesting in
+cases where large numbers of instances are stored in a collection.  To estimate
+such memory use, I check the Python process size under Linux using the VmSize
+field of `/proc/self/status`, before and after constructing a list of instances.
+From the increase in process size, I subtract the comparable increase for
+creating a list of `None`, then divide by the number of elements.
+
+I assume that `numpy.datetime64` will be stored in `ndarray` objects, and
+`pandas.Timestamp` in Pandas datastructures, where each value occupies 8 bytes.
 
