@@ -314,7 +314,8 @@ numpy.datetime64('2017-11-21T22:21:26.994301000')
 |TEMPLATE           |?       |?       |?       |?       |?       |?       |
 
 [1] For numpy, we consider "datetime64[ns]" for times and "datetime64[D]" for dates.
-[2] Arrow also supports strptime-style parsing.
+
+<sup>2</sup> Arrow also supports strptime-style parsing.
 
 
 # Recommentations
