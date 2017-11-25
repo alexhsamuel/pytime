@@ -182,6 +182,25 @@ numpy.datetime64('2017-11-21T22:21:26.994301000')
 ```
 
 
+# Feature matrix
+
+|                           |datetime|Delorean|Arrow   |Pendulum|numpy   |Pandas  |
+|---------------------------|:------:|:------:|:------:|:------:|:------:|:------:|
+|naive time                 |✔       |?       |?       |?       |?       |?       |
+|localized time             |✔       |?       |?       |?       |?       |?       |
+|date                       |✔       |?       |?       |?       |?       |?       |
+|time of day                |✔       |?       |?       |?       |?       |?       |
+|time range                 |1-9999  |?       |?       |?       |?       |?       |
+|date range                 |1-9999  |?       |?       |?       |?       |?       |
+|time resolution            |1 µs    |1 µs    |1 µs    |1 µs    |1 ns    |1 ns    |
+|rounding                   |        |?       |?       |?       |?       |?       |
+|locales                    |        |?       |?       |?       |?       |?       |
+|humanizing                 |        |?       |?       |?       |?       |?       |
+|TEMPLATE                   |?       |?       |?       |?       |?       |?       |
+
+For numpy, we consider "datetime64[ns]" for times and "datetime64[D]" for dates.
+
+
 # Recommentations
 
 - Choose consistent time and date reperesentations.
@@ -214,13 +233,30 @@ numpy.datetime64('2017-11-21T22:21:26.994301000')
 
 - Use localized times in UIs.
 
-  Nontechnical users expect localized times formatted
+  Nontechnical users expect localized times formatted to their language- and
+  culture-specific conventions.
+
+- Don't use times to represent dates.
+
+  A date is a different animal; it represents a geographically specific interval
+  of (usually) 24 hours.  It often has additional domain-specific meaning,
+  particularl in finance.  Use a proper date representation, if available.
+
+  Despite what some libraries may have you believe, a date is not a time, and a
+  time is not a date.
 
 - Learn how to use `datetime`, even if it's not your primary representation.
 
   This is the _lingua franca_ for date and time representations in Python,
   supported by nearly every library and framework that needs them, e.g. APIs,
   database drivers, and formatting tools.
+
+- Use geographical time zones, not fixed UTC offsets. 
+
+  Fixed UTC offsets, _e.g._ UTC-5, are _not_ the time zones you care about.  For
+  correct results, you need to use greographical/political time zones, such as
+  "America/New_York" or "US/Eastern".
+
 
 
 # Appendices
