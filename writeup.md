@@ -271,7 +271,7 @@ numpy.datetime64('2017-11-26T10:29:15.875552000')
 |formatting         |strftime|Babel   |custom  |strftime<br>custom|✘|strftime|
 |locales            |✘       |✘       |custom  |custom  |✘       |✘       |
 |humanizing         |✘       |✔       |✔       |✔       |✘       |✘       |
-|approx mem<sup>3</sup>|40   |220     |512     |448     |40<br>8 in array|120<br>8 in idx/ser|
+|memory use<sup>3</sup>|40   |220     |512     |448     |40<br>8 in array|120<br>8 in idx/ser/df|
 |implementation     |C       |Python  |Python  |Python  |C       |Cython  |
 |interal repr       |components|`datetime`|`datetime`|`datetime`|ticks|`datetime`+ns|
 
@@ -280,10 +280,10 @@ numpy.datetime64('2017-11-26T10:29:15.875552000')
 <sup>2</sup> NumPy and Pandas represent dates as "datetime64[D]", _i.e._ times
 with 1 day precision.
 
-<sup>3</sup> Estimates of memory use in bytes for time values.  See appendix for
-details.  NumPy and Pandas store times as 8-byte values in collections (NumPy
-arrays; Pandas indexes, series, dataframes), but single objects consume more
-memory.
+<sup>3</sup> **Estimates** of memory use in bytes for single time values.  See
+appendix for details.  NumPy and Pandas store times as 8-byte values in
+collections (NumPy arrays; Pandas indexes, series, dataframes), but single
+objects consume more memory.
 
 
 # Recommentations
