@@ -319,7 +319,9 @@ collections (NumPy arrays; Pandas indexes, series, dataframes), but single
 objects consume more memory.
 
 
-# Recommentations
+# Recommendations
+
+These are the author's personal opinions.
 
 - Choose consistent time and date reperesentations.
 
@@ -328,16 +330,41 @@ objects consume more memory.
   the library that best meets your project's feature and performance needs, and
   use it consistently throughout.
 
-  - For ease of use, Pendulum and Arrow are good choices.
+- For ease of use, Pendulum is a good choice.
 
-  - For performance and compatibility, use `datetime` and `pytz`, with
-    `dateutil` for additional functionality if you need it.
+  Pendulum has tons of features, a solid API, and clear documentation.
+  Advantages over Delorean and Arrow: it provides additional types for dates,
+  time of day, intervals, etc.; and its types subclass the corresponding
+  `datetime` types, so can be used interchangably.
 
-  - For large datasets with times, NumPy and Pandas are far more memory
-    efficient.  If you use NumPy, `datetime64` is the obvious choice, though you
-    will find the features to be lacking.  If you use Pandas, `Timestamp` will
-    provide most of the features you need.  You may need additional libraries
-    for special uses.
+  Arrow is a solid second choice, if you don't care about date
+  handling&mdash;since it does not provide a date type.  Delorean lags in
+  features and performance.
+
+- For performance and compatibility, use `datetime`.
+
+  The implementation is highly optimized for single values.  The feature set is
+  bare-bones; you'll almost certainly need additional packages to fill feature
+  gaps:
+
+  - pytz is the faster time zone implementation, but dateutil.tz is a fine
+    choice if you use its other functionality.  Note the API differences.
+
+  - udatetime accellerates some operations, most notably string parsing.
+
+  - Babel provides locale-specific formatting.
+
+  - Humanize provides human-friendly representations.
+
+- For large data sets, use Pandas.
+
+  For large datasets with times, Pandas is far more memory efficient.  Its
+  `Timestamp` scalar type will provide most of the features you need; you may
+  need additional libraries for special uses.
+
+  If you already use NumPy heavily, `datetime64` is the obvious choice, though
+  its features are severely lacking.  You may have to wrap or reimplement some
+  of these yourself.
 
 - Prefer UTC for stored times.
 
@@ -355,11 +382,16 @@ objects consume more memory.
   The point of standards is that everyone should use them, despite personal
   preference.  This makes life easier for everyone.
 
-- Use UTC for formatted timestamps in APIs. 
+- Use geographical time zones, not fixed UTC offsets. 
 
-  Formatting a time as "2017-11-26T11:30:00-05:00" is like formatting the number
-  12 as "17-5".  The UTC offset does not specify a time zone, and is not
-  sufficient to equip the time with unambiguous localized date operations.
+  Fixed UTC offsets, _e.g._ UTC-5, are _not_ the time zones you care about.  For
+  correct results, you need to use greographical/political time zones, such as
+  "America/New_York" or "US/Eastern".
+
+  For the same reason, use UTC for formatted timestamps in APIs.  Formatting a
+  time as "2017-11-26T11:30:00-05:00" is a bit like formatting the number 16 as
+  "11-5".  The UTC offset does not specify a time zone, and is not sufficient to
+  equip the time with unambiguous localized date operations.
 
 - Use time zone- and locale-aware times in UIs.
 
@@ -381,15 +413,11 @@ objects consume more memory.
   supported by nearly every library and framework that needs them, e.g. APIs,
   database drivers, and formatting tools.
 
-- Use geographical time zones, not fixed UTC offsets. 
-
-  Fixed UTC offsets, _e.g._ UTC-5, are _not_ the time zones you care about.  For
-  correct results, you need to use greographical/political time zones, such as
-  "America/New_York" or "US/Eastern".
-
 
 
 # Benchmarks
+
+Below are microbenchmark results for several common time operations.
 
 ```
 get current UTC time
@@ -436,6 +464,9 @@ parse UTC time
  20.64 µs =  1.5  pendulum.strptime
  16.27 µs =  1.2  pendulum.parse
 ```
+
+The usual warnings about interpreting microbenchmark results apply here.  See
+the appendix for details.
 
 
 # Appendices

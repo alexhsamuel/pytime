@@ -77,6 +77,7 @@
 - pytzdata 2017.3.1 (pip) for pendulum
 - babel 2.5.0 (conda) for delorean
 - tzlocal 1.2 (pip) for delorean
+- humanize 0.5 (pip)
 
 
 # Exercises
