@@ -16,7 +16,7 @@
       a, a:visited {
         color: black;
         text-decoration: none;
-        bottom-border: 1px dashed #8080ff;
+        border-bottom: 1px dashed #8080c0;
       }
 
       .remark-slide-content {
@@ -24,9 +24,9 @@
       }
       .remark-code, .remark-inline-code {
         font-family: 'Roboto Mono';
-        font-weight: 500;
-        font-size: 90%;
-        color: #406040;
+        font-weight: 400;
+        font-size: 85%;
+        color: #305060;
       }
       .remark-code-line {
         margin-left: 24px;
@@ -61,11 +61,11 @@
   <body>
     <textarea id="source">
 class: center, middle
-<h1>It's about time</h1>
+# It's about time
 Alex Samuel
 
 ---
-<h1>Goals</h1>
+# Goals
 - Present general concerns in handling time and date.
 - Survey the options in Python.
 - Discuss features, performance.
@@ -82,6 +82,9 @@ My goal is to bore you with the gory details of dealing with times, dates, and
 time zones.  I'll stick to civil time as is widely used in business, and
 won't go into leap seconds, relativistic effects, or astronomical time systems.
 
+Also this is not a tutorial!  My goal is to help you to choose the best tool
+for your work.
+
 ---
 class: advice, middle
 I will also give you some advice.
@@ -96,7 +99,7 @@ Advice slides look like this.
 They contain my _opinions_.
 
 ---
-<h1>Who am I?</h1>
+# Who am I?
 - Writing Python since version 1.4.
 - Used to work in high energy physics; now finance.
 - Write lots of date and time code.
@@ -112,12 +115,12 @@ Now I work at Tudor Investment Corporation.
 
 ---
 class: middle
-<h1>Preliminaries</h1>
+# Preliminaries
 ???
 Let's start by discussing some concepts.
 
 ---
-<h1>Time</h1>
+# Time
 - Like space except just one dimension.
 - Increases monotonically.
 ???
@@ -132,7 +135,7 @@ when a user performed an action, or when some external event was measured, or
 when a transaction occurred.
 
 ---
-<h1>Date</h1>
+# Date
 - Time is divided into days.
 - A day is recurring span of (usually) 24 hours.
 - Date specifies a day.
@@ -144,7 +147,7 @@ time of day relative to the beginning of that date, using a bizarre set of units
 called years, months, days, hours, minutes, and seconds.
 
 ---
-<h1>Time zones</h1>
+# Time zones
 <img src="Time-Zone-Map.gif" style="width: 85%;">
 ???
 To complicate things further, we don't agree on when each day starts.  
@@ -158,13 +161,7 @@ Governments is free to change their minds about time zones, and they do so
 regularly.
 
 ---
-class: advice, middle
-Time zones are complicated.
-
-Use UTC internally, and convert to other time zones in UIs.
-
----
-<h1>Time zone database</h1>
+# Time zone database
 <a href="https://www.iana.org/time-zones">Database</a> a.k.a. "Olson database".
 - Linux, macOS: `/usr/share/zoneinfo`
 - Windows: `tzres.dll`
@@ -177,7 +174,7 @@ current, and projected time zones offsets.
 Often called the "Olson database".
 
 ---
-<h1>Time formats</h1>
+# Time formats
 
 [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html)
 / [RFC 3339](https://tools.ietf.org/html/rfc3339):
@@ -212,14 +209,16 @@ Use RFC 3339 time format in APIs and data files.
 User interfaces for nontechnical users will need more human-centric formats.
 
 ---
-<h1>Python representations</h1>
+class: middle
+# Python representations
+???
 1. primitive representations
 2. datetime & friends
 3. datetime derivatives
 4. data representations
 
 ---
-<h1>Primitive</h1>
+# Primitive
 - string times and dates: 
     - `"2017-11-25"` 
     - `"2017-11-25T16:01:30+00:00"`
@@ -247,7 +246,7 @@ Don't use strings internally if you perform _any_ time operations.
 Don't use integer-encoded times and dates.
 
 ---
-<h1>Tick representations</h1>
+# Tick representations
 Choose a starting time ("epoch") and a unit, and count ticks.
 ```py
 # seconds since 1970-01-01T00:00:00+00:00
@@ -255,15 +254,123 @@ Choose a starting time ("epoch") and a unit, and count ticks.
 1511734953.8993392  
 ```
 ???
-This is closest to the physical meaning of dates.  Simple.  Clear.
+UNIX, and Python, traditionally use UTC midnight on Jan 1, 1970 as the epoch.
+
+This is closest to the physical meaning of dates.  Simple.  Clear.  When one
+second elapses, this number increases by 1.
 
 If it weren't for humans and their idiosyncrasies, this would be my last slide.
 
 Unfortunately, we are humans.
 
 ---
-<h1>datetime</h1>
+# [datetime](https://docs.python.org/3/library/datetime.html)
 
+The standard library `datetime` package solves many of our problems.
+
+A time (an instance of the `datetime` class) can be,
+  - _naive_, without time zone
+  - _localized_, with time zone 
+???
+Stores times as year, month, day, hour, minute, second, microsecond components.
+Resolution is 1 µs.  
+
+Implemented in C and rather efficient.
+
+---
+class: advice, middle
+Time zones are complicated.
+
+Use UTC internally, and convert to other time zones in UIs.
+???
+Some choose to use naive datetimes and always store UTC.  
+
+IMO, this becomes confusing if you ever have to use localized datetimes for
+the UI, so I prefer datetimes localized to UTC.
+
+---
+class: middle
+```py
+>>> t = datetime.utcnow()
+>>> t.year, t.month, t.day
+(2017, 11, 26)
+>>> t.date()
+datetime.date(2017, 11, 26)
+```
+Formatting and parsing per C library `strptime()` / `strftime()`.
+```py
+>>> t = datetime(2017, 11, 26, 17, 45, 37)
+>>> format(t, "%Y-%m-%dT%H:%M:%S")
+'2017-11-26T17:45:37'
+```
+???
+Participates nicely with Python's string formatting.
+
+---
+class: advice, middle
+
+Don't use a time to represent a date.
+???
+Dates are fundamentally different objects, with different operations they can
+participate in.
+
+Some systems represent dates as the time at midnight on that date.  Python
+gives you a date type.  Use it.
+
+---
+# Shortcomings of datatime
+- `tzinfo` interface but no concrete time zones
+- limited convenience functions and utilities
+- 1 µs resolution 
+???
+One approach is to address these shortcomings with different libraries.
+---
+# datetime + [pytz](http://pythonhosted.org/pytz/)
+- Includes a recent copy of the time zone database.
+- Implements `tzinfo`.
+
+```py
+>>> tz = pytz.timezone("America/New_York")
+>>> tz.localize(datetime.now())
+datetime.datetime(2017, 11, 26, 18, 1, 6, 620221,
+  tzinfo=<DstTzInfo 'America/New_York' EST-1 day, 
+          19:00:00 STD>)
+```
+???
+datetime.now() returns a naive datetime; the time zone's localize method
+converts it to a localized datetime.
+
+---
+# datetime + [dateutil](https://dateutil.readthedocs.io/en/stable/)
+- Implements `tzinfo` using the system time zone database.
+- Also includes a copy of the time zone database.
+
+```py
+>>> tz = dateutil.tz.gettz("America/New_York")
+```
+
+- Convenient parsing.
+
+```py
+>>> dateutil.parser.parse("2017 Nov 1 9:15:00 UTC")
+datetime.datetime(2017, 11, 1, 9, 15, 
+    tzinfo=tzutc())
+```
+???
+An oldie but goodie.
+
+Also provides some recurrence / calendar functionality, which I won't get into
+here, plus calculation of Easter, which is a historically interesting problem.
+
+---
+# datetime + [Babel](http://babel.pocoo.org/en/latest/)
+An internationalization library with time and date support.
+```py
+>>> babel.dates.format_datetime(t, locale="zh")
+'2017年11月26日 下午11:32:31'
+```
+
+???
 
     </textarea>
     <script src="remark-latest.min.js"></script>
