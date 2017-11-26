@@ -271,7 +271,7 @@ numpy.datetime64('2017-11-26T10:29:15.875552000')
 |formatting         |strftime|Babel   |custom  |strftime<br>custom|✘|strftime|
 |locales            |✘       |✘       |custom  |custom  |✘       |✘       |
 |humanizing         |✘       |✔       |✔       |✔       |✘       |✘       |
-|approx mem (bytes) |40      |220     |512     |448     |8<sup>3</sup>|8<sup>3</sup>|
+|approx mem<sup>3</sup>|40   |220     |512     |448     |40<br>8 in array|120<br>8 in idx/ser|
 |implementation     |C       |Python  |Python  |Python  |C       |Cython  |
 |interal repr       |components|`datetime`|`datetime`|`datetime`|ticks|`datetime`+ns|
 
@@ -280,9 +280,10 @@ numpy.datetime64('2017-11-26T10:29:15.875552000')
 <sup>2</sup> NumPy and Pandas represent dates as "datetime64[D]", _i.e._ times
 with 1 day precision.
 
-<sup>3</sup> A `datetime64` takes 8 bytes in an ndarray, but substantially more
-as a freestanding object.  Similarly, a `pandas.Timestamp` takes 8 bytes in an
-index, series, or dataframe, but substantially more as a freestanding object.
+<sup>3</sup> Estimates of memory use in bytes for time values.  See appendix for
+details.  NumPy and Pandas store times as 8-byte values in collections (NumPy
+arrays; Pandas indexes, series, dataframes), but single objects consume more
+memory.
 
 
 # Recommentations
