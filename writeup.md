@@ -69,6 +69,39 @@ summer, just as the U.S. Eastern time zone is on EST in the winter and EDT in
 the summer.
 
 
+# Formatting
+
+There are countless ways to format dates and times as strings in use, for both
+human and machine consumption.  Historically, many computer programs used
+existing or invented formats to suit the developers' or users' preferences.
+
+Even standard formats are language-, culture-, and country-specific.  [POSIX
+_locales_](http://pubs.opengroup.org/onlinepubs/009695399/basedefs/xbd_chap07.html)
+(not to be confused with _localization_, described below) specify standard date
+and time formats for specific regions and languages.
+
+The [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) standard
+specifies a family of standard formats for machine-readable dates and times.
+[RFC 3339](https://tools.ietf.org/html/rfc3339) recommends a particular subset
+of ISO 8601 formats for use in Internet protocols.  These are examples of RFC
+3339 timestamps:
+
+```
+1937-01-01T12:00:27.87+00:20
+1990-12-31T23:59:60Z
+```
+
+The 'Z' suffix stands for UTC; it derives from the "Zulu" [military time
+zone](https://en.wikipedia.org/wiki/List_of_military_time_zones), which has a
+zero UTC offset.  This can be used interchangably with explicit "+00:00".
+
+_Note that a UTC offset does not unambiguously specify a time zone!_ The time
+"2017-11-26T11:06:08.465019-05:00" has a UTC offset of &ndash;5 hours.  It may
+be the current time in America/New_York... but also in America/Toronto,
+America/Havana, America/Lima, and others.  These time zones coincide at this
+given instant, but may vary in their UTC offsets over the year and over history.
+
+
 # Primitive representations
 
 Several _ad hoc_ representations are widely used for times and dates.
@@ -267,7 +300,7 @@ numpy.datetime64('2017-11-26T10:29:15.875552000')
 |time resolution    |1 µs    |1 µs    |1 µs    |1 µs    |1 ns    |1 ns    |
 |date range         |1-9999  |        |        |1-9999  |huge    |huge    |
 |rounding           |✘       |✔       |✔       |✔       |✘       |✔       |
-|parsing            |strptime|udatetime|strftime<br>custom|strftime<br>custom|limited |?       |
+|parsing            |strptime|udatetime|strptime<br>custom|strptime<br>custom|limited|strptime<br>custom|
 |formatting         |strftime|Babel   |custom  |strftime<br>custom|✘|strftime|
 |locales            |✘       |✘       |custom  |custom  |✘       |✘       |
 |humanizing         |✘       |✔       |✔       |✔       |✘       |✘       |
@@ -321,6 +354,12 @@ objects consume more memory.
 
   The point of standards is that everyone should use them, despite personal
   preference.  This makes life easier for everyone.
+
+- Use UTC for formatted timestamps in APIs. 
+
+  Formatting a time as "2017-11-26T11:30:00-05:00" is like formatting the number
+  12 as "17-5".  The UTC offset does not specify a time zone, and is not
+  sufficient to equip the time with unambiguous localized date operations.
 
 - Use time zone- and locale-aware times in UIs.
 
