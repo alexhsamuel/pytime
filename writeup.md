@@ -184,6 +184,25 @@ languages.
 
 ## Pendulum
 
+The `pendulum` package provides classes that subclass those in the `datetime` to
+extend their APIs.  Because Pendulum uses subclassing, its instances are drop-in
+replacements for the standard `datetime` types'.
+
+- `pendulum.Pendulum` extends `datetime.datetime`
+- `pendulum.Date` extends `datetime.date`
+- `pendulum.Time` extends `datetime.time`
+- `pendulum.Interval` extends `datetime.timedelta`
+- `pendulum.Timezone` extends `datetime.tzinfo`
+
+Pendulum uses the pytzdata package for time zone data, but implements the time
+zone data format itself.
+
+Pendulum supports strftime-style formatting and its own JODA-style formatter for
+dates and times.  It also provides a "humanized" formatting for time intervals.
+
+
+## numpy
+
 
 ## Pandas
 
@@ -215,27 +234,23 @@ numpy.datetime64('2017-11-21T22:21:26.994301000')
 
 |                   |datetime|Delorean|Arrow   |Pendulum|numpy<sup>1</sup>|Pandas  |
 |-------------------|:------:|:------:|:------:|:------:|:------:|:------:|
-|naive time         |✔       |✘       |✘       |?       |✔       |?       |
-|localized time     |✔       |✔       |✔       |?       |✘       |?       |
-|date               |✔       |✘       |✘       |?       |✔       |?       |
-|time of day        |✔       |✘       |✘       |?       |✘       |?       |
-|time range         |1-9999  |1-9999  |1-9999  |?       |1678-2262|?       |
+|naive time         |✔       |✘       |✘       |✘       |✔       |?       |
+|localized time     |✔       |✔       |✔       |✔       |✘       |?       |
+|date               |✔       |✘       |✘       |✔       |✔       |?       |
+|time of day        |✔       |✘       |✘       |✔       |✘       |?       |
+|time range         |1-9999  |1-9999  |1-9999  |1-9999  |1678-2262|?       |
 |time resolution    |1 µs    |1 µs    |1 µs    |1 µs    |1 ns    |1 ns    |
-|date range         |1-9999  |        |        |?       |huge    |?       |
-|rounding           |✘       |✔       |✔       |?       |✘       |?       |
-|parsing            |strptime|udatetime|custom<sup>2</sup>|?       |limited |?       |
-|formatting         |strftime|Babel   |custom  |?       |✘       |?       |
-|locales            |✘       |✘       |custom  |?       |✘       |?       |
-|humanizing         |✘       |✔       |✔       |?       |✘       |?       |
+|date range         |1-9999  |        |        |1-9999  |huge    |?       |
+|rounding           |✘       |✔       |✔       |✔       |✘       |?       |
+|parsing            |strptime|udatetime|strftime+custom|strftime+custom|limited |?       |
+|formatting         |strftime|Babel   |custom  |custom  |✘       |?       |
+|locales            |✘       |✘       |custom  |custom  |✘       |?       |
+|humanizing         |✘       |✔       |✔       |✔       |✘       |?       |
 |approx mem (bytes) |40      |220     |512     |448     |8<sup>3</sup>|8<sup>3</sup>|
 |implementation     |C       |Python  |Python  |Python  |C       |Cython  |
 |interal repr       |components|`datetime`|`datetime`|`datetime`|ticks|`datetime`+ns|
 
-|TEMPLATE           |?       |?       |?       |?       |?       |?       |
-
 <sup>1</sup> For numpy, we consider "datetime64[ns]" for times and "datetime64[D]" for dates.
-
-<sup>2</sup> Arrow also supports strptime-style parsing.
 
 <sup>3</sup> A `datetime64` takes 8 bytes in an ndarray, but substantially more
 as a freestanding object.  Similarly, a `pandas.Timestamp` takes 8 bytes in an
