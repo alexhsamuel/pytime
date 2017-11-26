@@ -242,7 +242,7 @@ numpy.datetime64('2017-11-21T22:21:26.994301000')
 |time resolution    |1 µs    |1 µs    |1 µs    |1 µs    |1 ns    |1 ns    |
 |date range         |1-9999  |        |        |1-9999  |huge    |?       |
 |rounding           |✘       |✔       |✔       |✔       |✘       |?       |
-|parsing            |strptime|udatetime|strftime+custom|strftime+custom|limited |?       |
+|parsing            |strptime|udatetime|strftime<br>custom|strftime<br>custom|limited |?       |
 |formatting         |strftime|Babel   |custom  |custom  |✘       |?       |
 |locales            |✘       |✘       |custom  |custom  |✘       |?       |
 |humanizing         |✘       |✔       |✔       |✔       |✘       |?       |
