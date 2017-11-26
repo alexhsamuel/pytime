@@ -140,6 +140,24 @@ human-friendly representations that also support temporal operations.
 
 # The packages
 
+## datetime
+
+The datetime package, in the Python standard library, provides the standadrd
+Python implementations time type:
+- `datetime.datetime` for (full) time
+- `datetime.date` for date
+- `datetime.time` for time of day
+- `datetime.timedelta` for time/date interval
+
+While `datetime.tzinfo` specifies the interface for time zone objects, the only
+concrete implementation is UTC.  Other packages are required for time zone
+support.
+
+Under the hood, these types are implemented as C extension functions, and
+perform very well.  The time and date types reprent values as year, month, date,
+hour, minute, second, microsecond components.
+
+
 ## dateutil
 
 `dateutil.tz` provides an implementation of `tzinfo` that, by default, uses
