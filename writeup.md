@@ -201,56 +201,84 @@ Pendulum supports strftime-style formatting and its own JODA-style formatter for
 dates and times.  It also provides a "humanized" formatting for time intervals.
 
 
-## numpy
+## NumPy
 
 
 ## Pandas
 
-Uses `datetime64` arrays, but scalars exposed as `pandas.Timestamp` 
-[implemented in Cython](https://github.com/pandas-dev/pandas/blob/master/pandas/_libs/tslibs/timestamps.pyx).
+Pandas is built on top of NumPy, and uses `datetime64` arrays to represent time
+and date values.  Pandas extends NumPy's functionality in two major ways:
+
+First, even though NumPy datetime64 arrays are always naive, Pandas's datetime
+indexes and series can carry a time zone; all index values are localized to that
+time zone.  Naive datetime indexes are also allowed.
+
+`DatetimeIndex` instances have time zone methods `tz_localize()` and
+`tz_convert()`.
 
 ```py
->>> ser = pd.Series([ datetime.datetime.now() for _ in range(10) ])
->>> ser
-0   2017-11-21 22:21:26.994301
-1   2017-11-21 22:21:26.994310
-2   2017-11-21 22:21:26.994312
-3   2017-11-21 22:21:26.994313
-4   2017-11-21 22:21:26.994315
-5   2017-11-21 22:21:26.994317
-6   2017-11-21 22:21:26.994319
-7   2017-11-21 22:21:26.994320
-8   2017-11-21 22:21:26.994322
-9   2017-11-21 22:21:26.994324
-dtype: datetime64[ns]
->>> ser.iloc[0]
-Timestamp('2017-11-21 22:21:26.994301')
->>> ser.values[0]
-numpy.datetime64('2017-11-21T22:21:26.994301000')
+>>> di = pd.DatetimeIndex([ datetime.now() for _ in range(4) ]).tz_localize("America/New_York")
 ```
+
+`Series` instances have these methods on a `dt` proxy attribute.
+
+```py
+>>> ser = pd.Series([ datetime.now() for _ in range(4) ]).dt.tz_localize("America/New_York")
+```
+
+A number of other time-specific functions, such as rounding and (year, month,
+...) component access are also available.
+   
+
+Second, while NumPy's datetime64 arrays produce scalar values of the
+`np.datetime64` type, Pandas's time series indexes and series use a custom
+`Timestamp` type to represent individual values.  This type extends
+`datetime.datetime` and is [implemented in
+Cython](https://github.com/pandas-dev/pandas/blob/master/pandas/_libs/tslibs/timestamps.pyx).
+
+```py
+>>> ser = pd.Series([ datetime.now() for _ in range(4) ])
+>>> ser
+0   2017-11-26 10:29:15.875552
+1   2017-11-26 10:29:15.875560
+2   2017-11-26 10:29:15.875562
+3   2017-11-26 10:29:15.875564
+dtype: datetime64[ns]
+>>> ser[0]
+Timestamp('2017-11-26 10:29:15.875552')
+>>> ser.values[0]
+numpy.datetime64('2017-11-26T10:29:15.875552000')
+```
+
+`Timestamp` is a subclass of `datetime.datetime`; it augments the resolution to
+1 ns and adds a number of convenience methods.
+
 
 
 # Feature matrix
 
-|                   |datetime|Delorean|Arrow   |Pendulum|numpy<sup>1</sup>|Pandas  |
+|                   |datetime|Delorean|Arrow   |Pendulum|NumPy<sup>1</sup>|Pandas  |
 |-------------------|:------:|:------:|:------:|:------:|:------:|:------:|
-|naive time         |✔       |✘       |✘       |✘       |✔       |?       |
-|localized time     |✔       |✔       |✔       |✔       |✘       |?       |
-|date               |✔       |✘       |✘       |✔       |✔       |?       |
-|time of day        |✔       |✘       |✘       |✔       |✘       |?       |
-|time range         |1-9999  |1-9999  |1-9999  |1-9999  |1678-2262|?       |
+|naive time         |✔       |✘       |✘       |✘       |✔       |✔       |
+|localized time     |✔       |✔       |✔       |✔       |✘       |✔       |
+|date               |✔       |✘       |✘       |✔       |✔<sup>2</sup>|✔<sup>2</sup>|
+|time of day        |✔       |✘       |✘       |✔       |✘       |✘       |
+|time range         |1-9999  |1-9999  |1-9999  |1-9999  |1678-2262|1678-2262|
 |time resolution    |1 µs    |1 µs    |1 µs    |1 µs    |1 ns    |1 ns    |
-|date range         |1-9999  |        |        |1-9999  |huge    |?       |
-|rounding           |✘       |✔       |✔       |✔       |✘       |?       |
+|date range         |1-9999  |        |        |1-9999  |huge    |huge    |
+|rounding           |✘       |✔       |✔       |✔       |✘       |✔       |
 |parsing            |strptime|udatetime|strftime<br>custom|strftime<br>custom|limited |?       |
-|formatting         |strftime|Babel   |custom  |custom  |✘       |?       |
-|locales            |✘       |✘       |custom  |custom  |✘       |?       |
-|humanizing         |✘       |✔       |✔       |✔       |✘       |?       |
+|formatting         |strftime|Babel   |custom  |strftime<br>custom|✘|strftime|
+|locales            |✘       |✘       |custom  |custom  |✘       |✘       |
+|humanizing         |✘       |✔       |✔       |✔       |✘       |✘       |
 |approx mem (bytes) |40      |220     |512     |448     |8<sup>3</sup>|8<sup>3</sup>|
 |implementation     |C       |Python  |Python  |Python  |C       |Cython  |
 |interal repr       |components|`datetime`|`datetime`|`datetime`|ticks|`datetime`+ns|
 
-<sup>1</sup> For numpy, we consider "datetime64[ns]" for times and "datetime64[D]" for dates.
+<sup>1</sup> For NumPy, we consider "datetime64[ns]" for times and "datetime64[D]" for dates.
+
+<sup>2</sup> NumPy and Pandas represent dates as "datetime64[D]", _i.e._ times
+with 1 day precision.
 
 <sup>3</sup> A `datetime64` takes 8 bytes in an ndarray, but substantially more
 as a freestanding object.  Similarly, a `pandas.Timestamp` takes 8 bytes in an
@@ -271,8 +299,8 @@ index, series, or dataframe, but substantially more as a freestanding object.
   - For performance and compatibility, use `datetime` and `pytz`, with
     `dateutil` for additional functionality if you need it.
 
-  - For large datasets with times, numpy and Pandas are far more memory
-    efficient.  If you use numpy, `datetime64` is the obvious choice, though you
+  - For large datasets with times, NumPy and Pandas are far more memory
+    efficient.  If you use NumPy, `datetime64` is the obvious choice, though you
     will find the features to be lacking.  If you use Pandas, `Timestamp` will
     provide most of the features you need.  You may need additional libraries
     for special uses.
