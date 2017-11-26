@@ -271,7 +271,7 @@ numpy.datetime64('2017-11-26T10:29:15.875552000')
 |formatting         |strftime|Babel   |custom  |strftime<br>custom|✘|strftime|
 |locales            |✘       |✘       |custom  |custom  |✘       |✘       |
 |humanizing         |✘       |✔       |✔       |✔       |✘       |✘       |
-|memory use<sup>3</sup>|40   |220     |512     |448     |40<br>8 in array|120<br>8 in idx/ser/df|
+|memory use<sup>3</sup>|40   |220     |512     |448     |40 (single)<br>8 (bulk)|120 (single)<br>8 (bulk)|
 |implementation     |C       |Python  |Python  |Python  |C       |Cython  |
 |interal repr       |components|`datetime`|`datetime`|`datetime`|ticks|`datetime`+ns|
 
