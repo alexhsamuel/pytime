@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>It's about time</title>
+    <link href="fonts" rel="stylesheet"> 
+    <style>
+      body {
+        font-family: 'Roboto Condensed';
+        font-weight: 400;
+      }
+      h1, h2, h3 {
+        font-family: 'Roboto Condensed';
+        font-weight: 700;
+      }
+      a, a:visited {
+        color: black;
+        text-decoration: none;
+        bottom-border: 1px dashed #8080ff;
+      }
+
+      .remark-slide-content {
+        font-size: 28px;
+      }
+      .remark-code, .remark-inline-code {
+        font-family: 'Roboto Mono';
+        font-weight: 500;
+        font-size: 90%;
+        color: #406040;
+      }
+      .remark-code-line {
+        margin-left: 24px;
+      }
+      .remark-slide-scaler {
+        width: 1024px !important;
+        height: 576px !important;
+      }
+
+      .command {
+        border: 2px solid #808080;
+        background: #f0f0f0;
+        padding: 1.4ex 1.5ex 1.5ex 1.5ex;
+      }
+      .comment {
+        font-size: 85%;
+        font-weight: 700;
+        font-style: italics;
+        color: #ab5018;
+      }
+
+      .advice {
+        background: #f0f8ff;
+        background-image: url('speech-balloon.png');
+        background-size: 100px 80px;
+        background-repeat: no-repeat;
+        background-origin: border-box;
+        background-position: right top;
+      }
+    </style>
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle
+<h1>It's about time</h1>
+Alex Samuel
+
+---
+<h1>Goals</h1>
+- Present general concerns in handling time and date.
+- Survey the options in Python.
+- Discuss features, performance.
+
+???
+I signed up to do this talk because there are a bewildering array of options
+for working with times and dates in Python.  I work with some of them on a 
+regular bases, but there are others I have used only occasionally or not at all.
+
+In order to force myself to evaluate all the choices currently out there,
+I submitted to do this talk.
+
+My goal is to bore you with the gory details of dealing with times, dates, and
+time zones.  I'll stick to civil time as is widely used in business, and
+won't go into leap seconds, relativistic effects, or astronomical time systems.
+
+---
+class: advice, middle
+I will also give you some advice.
+
+<div style="float: right;">
+  <img src="grain-of-salt.jpg" style="width: 200px;">
+  <br><span style="font-size: 60%;"><i>Fig 1. Grain of salt.</i></span>
+</div>
+
+Advice slides look like this.
+
+They contain my _opinions_.
+
+---
+<h1>Who am I?</h1>
+- Writing Python since version 1.4.
+- Used to work in high energy physics; now finance.
+- Write lots of date and time code.
+
+<svg class="octicon octicon-mark-github" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"></path></svg>
+<a href="https://github.com/alexhsamuel" style="font-size: 90%;">alexhsamuel</a>
+???
+Who am I, so you can determine whether to heed my advice?
+
+Now I work at Tudor Investment Corporation.
+
+... where languish lots of uncompleted projects you've never heard of.
+
+---
+class: middle
+<h1>Preliminaries</h1>
+???
+Let's start by discussing some concepts.
+
+---
+<h1>Time</h1>
+- Like space except just one dimension.
+- Increases monotonically.
+???
+What's time?
+
+Without getting too philosophical, time is kind of like space except one
+coordinate instead of three, and grows monotonically.  Basically pretty simple.
+
+Mostly, in computer programs, we want to record the exact instant of time at
+which a particular event happened, for example when a log line was recorded, or
+when a user performed an action, or when some external event was measured, or
+when a transaction occurred.
+
+---
+<h1>Date</h1>
+- Time is divided into days.
+- A day is recurring span of (usually) 24 hours.
+- Date specifies a day.
+???
+Humans have to complicate something as simple as this.
+
+We traditionally specify time by first specifying a date, and then giving the 
+time of day relative to the beginning of that date, using a bizarre set of units
+called years, months, days, hours, minutes, and seconds.
+
+---
+<h1>Time zones</h1>
+<img src="Time-Zone-Map.gif" style="width: 85%;">
+???
+To complicate things further, we don't agree on when each day starts.  
+
+Governments slice their territories into time zones, and appoint some time
+offset to a reference time zone called UTC.
+
+This offset may change during the year, due to daylight savings time.
+
+Governments is free to change their minds about time zones, and they do so
+regularly.
+
+---
+class: advice, middle
+Time zones are complicated.
+
+Use UTC internally, and convert to other time zones in UIs.
+
+---
+<h1>Time zone database</h1>
+<a href="https://www.iana.org/time-zones">Database</a> a.k.a. "Olson database".
+- Linux, macOS: `/usr/share/zoneinfo`
+- Windows: `tzres.dll`
+
+Geographic names like "America/New_York".
+???
+Fortunately, the selfless souls at IANA maintain a database of historical,
+current, and projected time zones offsets. 
+
+Often called the "Olson database".
+
+---
+<h1>Time formats</h1>
+
+[ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html)
+/ [RFC 3339](https://tools.ietf.org/html/rfc3339):
+
+<div class="center" style="background: gold; font-weight: 700;">2017-11-25T21:01:30+00:00</div>
+
+Also:
+<pre style="font-size: 85%;">
+2017-11-25 16:01:30 -05:00
+2017/11/25 16:01:30
+11/25/17 16:01:30
+2017 November 25 16:01:39
+Sat, 25 Nov 2017 16:01:39 -0500
+sábado 25 noviembre 2017 16:01:03
+...
+</pre>
+???
+There are countless variations on how to format times and dates as strings.
+
+For user interfaces, you may have to support a variety of region-, culture-, and
+language-specific formats.
+
+For computers, there is a standard family of formats called ISO 8601, and a
+more specific standard RFC 3339.
+
+Sometimes you'll see a "Z" suffix instead of +00:00 to specify UTC.
+
+---
+class: advice, middle
+Use RFC 3339 time format in APIs and data files.
+???
+User interfaces for nontechnical users will need more human-centric formats.
+
+---
+<h1>Python representations</h1>
+1. primitive representations
+2. datetime & friends
+3. datetime derivatives
+4. data representations
+
+---
+<h1>Primitive</h1>
+- string times and dates: 
+    - `"2017-11-25"` 
+    - `"2017-11-25T16:01:30+00:00"`
+- integer-encoded strings:
+    - `20171125`
+
+<br>
+```py
+date = 10000 * year + 100 * month + day    # ☹
+```
+???
+The chief benefit of these is that they work with all languages, frameworks,
+and file formats.
+
+But, there are basically no time operations you can perform on these
+representations.
+
+---
+class: advice, middle
+
+Use RFC 3339 strings for simple formats: CSV, JSON, ...
+
+Don't use strings internally if you perform _any_ time operations.
+
+Don't use integer-encoded times and dates.
+
+---
+<h1>Tick representations</h1>
+Choose a starting time ("epoch") and a unit, and count ticks.
+```py
+# seconds since 1970-01-01T00:00:00+00:00
+>>> time.time()
+1511734953.8993392  
+```
+???
+This is closest to the physical meaning of dates.  Simple.  Clear.
+
+If it weren't for humans and their idiosyncrasies, this would be my last slide.
+
+Unfortunately, we are humans.
+
+---
+<h1>datetime</h1>
+
+
+    </textarea>
+    <script src="remark-latest.min.js"></script>
+    <script>
+      const slideshow = remark.create()
+    </script>
+  </body>
+</html>
+
+      
