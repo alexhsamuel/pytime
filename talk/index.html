@@ -144,13 +144,14 @@ details.  The writeup is still a work in progress, and I welcome your feedback.
 ???
 I signed up to do this talk because there are a bewildering array of options
 for working with times and dates in Python.  I work with some of them on a 
-regular bases, but there are others I have used only occasionally or not at all.
+regular basis, but others I have used only occasionally or not at all.
 
-In order to force myself to evaluate all the choices currently out there,
+In order to force myself to evaluate the choices currently out there,
 I submitted to do this talk.
 
 I'm warning you now, this will be the least sexy talk you attend today.  My goal
 is to bore you with gory details of dealing with times, dates, and time zones.
+
 I'll stick to civil time as is widely used in business, and won't go into leap
 seconds, relativistic effects, or astronomical time systems.
 
@@ -170,8 +171,9 @@ Advice slides look like this.
 
 They contain my _opinions_.
 ???
-To distinguish my recommendations from information, I've formatted advice slides
-like this.  Take them with a grain of salt.
+To distinguish my personal recommendations from information, I've formatted
+advice slides like this, with a speech bubble in the corner.  Take them with a
+grain of salt.
 
 ---
 # Who am I?
@@ -184,14 +186,15 @@ like this.  Take them with a grain of salt.
 ???
 First, who am I, so that you can determine whether to heed my advice?
 
-In the past, I worked in physics, where I wrote lots of Python data handling
-code.  Now I work in finance, at Tudor Investment Corporation, where I write
-lots of Python data handling code.
+I've been writing Python code for a long time.  In the past, I worked in
+physics, where I wrote lots of Python data handling code.  Now I work in
+finance, at Tudor Investment Corporation, where I write lots of Python data
+handling code.
 
 A lot of it involves times and dates, as you may imagine.
 
 My GitHub is alexhsamuel.  There you will find lots of languishing, uncompleted
-projects, that you've never heard of.
+projects.  And this talk.
 
 ---
 class: middle
@@ -214,7 +217,6 @@ In computer programs, we mainly want to record the exact instant of time at
 which a particular event happened, for example,
 - when a log line was recorded,
 - when a user performed an action, 
-- when some external event was measured, 
 - or when a transaction occurred.
 
 ---
@@ -223,22 +225,22 @@ which a particular event happened, for example,
 - A day is recurring span of (usually) 24 hours.
 - Date specifies a day.
 ???
-Humans of course have to complicate something as simple as this.
+Humans of course have to go and complicate something as simple as this.
 
-First, we divide time into recurring spans of 24 hours, coinciding approximately
-with the Earth's rotation.
+What we do is divide time into recurring spans of (usually) 24 hours, called
+_days_, coinciding approximately with the Earth's rotation.
 
-Using this, traditionally specify time by first specifying a date, and then
-giving the time of day relative to the beginning of that date (midnight).
+Traditionally, we specify time by first specifying a date, and then giving the
+time of day relative to the beginning of that date (_midnight_).
 
-We using a bizarre set of units: years, 12 months a year, 27 to 31 days a month,
+We use a bizarre set of units: years, 12 months a year, 27 to 31 days a month,
 23 to 25 hours a day, 60 minutes an hour, and 60 seconds a minute.
 
 ---
 # Time zones
 <img src="Time-Zone-Map.gif" style="width: 85%;">
 ???
-To complicate things _event_ further, we don't event agree on when each day
+To complicate things _even_ further, we don't event agree on when each day
 starts.
 
 Each government slices its territories into _time zones_.  Within each time
@@ -268,9 +270,9 @@ On most Linux systems and macOS, it's installed in a bunch of files under
 `/usr/share/zoneinfo`; you can poke around there.  On Windows, its stuffed in a
 DLL.
 
-In the database, most time zones are identified by geographic continent and city
-names, like "America/New_York", which happens to be UTC-5 hours in the winter
-and UTC-4 hours when daylight savings time is in effect.
+In the database, a time zone is generally identified by a continent and city
+name, like "America/New_York", where we are.  We happen to be UTC-5 hours in the
+winter and UTC-4 hours when daylight savings time is in effect.
 
 Note that UTC-5 is not the same as "America/New_York" or even U.S. Eastern time.
 For example, the "America/Bogota" time zone is also UTC-5 and in fact since
@@ -319,23 +321,33 @@ Sometimes you'll see a "Z" suffix instead of +00:00 to indicate UTC.
 class: advice, middle
 Use the RFC 3339 time format in APIs and data files.
 ???
+This brings me to my first recommendation.
+
+...
+
 UIs for nontechnical users will need more human-centric formats.  But don't
-introduce unnecessary variation for machine-readable formats.
+introduce unnecessary variation for machine-readable formats.  Your code and
+data will be more compatible, and you will save yourself and others
+implementation nuisances.
 
 ---
 class: middle
 # Python representations
 ???
+Now, on to Python.
+
 I've found four general categoies of ways to represent times and dates in
 Python.
 
 1. representations using only built-in types: strings and integers
-2. the standard library's datetime package, & friends
+2. the standard library's datetime package, and some helper packages
 3. derivatives of the datetime library
-4. representations for collections of times and dates in datasets
+4. specialized representations for collections of times and dates in datasets
+
+I'll now go into each of these.
 
 ---
-# Primitive
+# Primitive types
 - string times and dates: 
     - `"2017-11-25"` 
     - `"2017-11-25T16:01:30+00:00"`
@@ -356,11 +368,11 @@ components into an integer.
 
 How many of you have written code like this at some point?
 
-The chief benefit of these is that they work with all languages, frameworks,
-and file formats.
+The chief benefit of these representations is that they work with all languages,
+frameworks, storage systems, and file formats.  You can always store a string.
 
 But, there are basically no time operations you can perform directly on these
-representations, except ordering them.  For anything else, you're on your own.
+representations directly.  You're on your own.
 
 ---
 class: advice, middle
@@ -369,10 +381,12 @@ Use RFC 3339 strings for simple formats: CSV, JSON, ...
 
 Don't use strings internally if you perform _any_ time operations.
 
-Don't use integer-encoded dates or times if you can help it.
+Don't use integer-encoded dates or times.
 
 ???
-My recommendations are...
+My recommendation is to avoid these.
+
+...
 
 Python provides actual data structures to use instead.
 
@@ -385,12 +399,12 @@ Choose a starting time ("epoch") and a unit, and count ticks.
 1511734953.8993392  
 ```
 ???
-Another representation that doesn't require specialized types you might call
-a _tick representation_.  Choose a starting time, called the _epoch_, choose a
-unit of time, and count ticks forward.
+Another representation that doesn't require specialized types you might call a
+_tick representation_.  You choose a starting time, called the _epoch_, you
+choose a unit of time, and just count ticks forward.
 
 In UNIX, and Python, we traditionally use UTC midnight on Jan 1, 1970 as the
-epoch.
+epoch, and count seconds.
 
 This representation is closest to the physical reality of time.  It's simple.
 Clear.  When one second elapses, this number increases by 1.
@@ -398,8 +412,8 @@ Clear.  When one second elapses, this number increases by 1.
 Python's simplest time API, `time.time()`, returns the time on system clock
 as seconds since the epoch.
 
-If it weren't for humans and their idiosyncrasies, we could stop here and this
-would be my last slide.
+If it weren't for humans and their idiosyncrasies, we could stop right here and
+this would be my last slide.
 
 Unfortunately, we are humans.
 
@@ -414,29 +428,17 @@ A time (an instance of the `datetime` class) can be,
 ???
 The standard library datetime package solves many of our problems.
 
-It provides a time type, also called `datetime`, which stores times internally
-as year, month, day, hour, minute, second, microsecond components.  So,
-resolution is 1 µs.
+It provides a time type, called `datetime`, which stores times internally as
+(year, month, day, hour, minute, second, microsecond) components.  
 
-There are two flavors of datetimes: _naive_ datetimes have no time zones, while
-localized datetimes do.  
+So, the time resolution is 1 µs.
 
-It also provides date and time of day types.
+There are two flavors of datetimes: _naive_ datetimes carry no time zones, while
+_localized_ datetimes do.
 
-These are implemented as C extension types, and rather efficient.
+The datetime package also provides date and time of day types.
 
----
-class: advice, middle
-Time zones are complicated.  Use UTC as much as possible:
-
-- Use UTC localized datetimes.
-
-- Convert to other time zones only in UIs.
-???
-Some people choose to use naive datetimes and just always store UTC.  
-
-IMO, this becomes confusing if you ever have to use localized datetimes for
-the UI, so I prefer datetimes localized to UTC.
+These are all implemented as C extension types, and rather efficient.
 
 ---
 class: middle
@@ -452,19 +454,25 @@ Formatting and parsing per C library `strftime()`.
 >>> t = datetime(2017, 11, 26, 17, 45, 37)
 >>> format(t, "%Y-%m-%dT%H:%M:%S")
 '2017-11-26T17:45:37'
+>>> print("It's now {:%H:%M}.".format(t))
+It's now 17:45.
 ```
 ???
-Back to the datetime class.  You can access its components as attributes,
-or extract the date or time of day as separate objects.
+You can access its components as attributes, or extract the date or time of day
+as separate objects.
 
 Parsing and formatting use patterns similar to the C library's strftime and
 strptime functions.  They participate nicely with Python's string formatting.
+You can stuff the format pattern directly into the curly braces.
 
 ---
 class: advice, middle
-
-Use a date object to represent a date, not a time object.
+To represent a date, use a date object, rather than a time object.
 ???
+Next recommendation:
+
+...
+
 Dates are fundamentally different objects, with different operations they can
 participate in.
 
@@ -477,16 +485,16 @@ Python gives you a real date type.  Use it.
 - limited convenience functions and utilities
 - 1 µs resolution 
 ???
-datetime has a number of limitations.
+The datetime package has a number of limitations.
 
 It provides a time zone API, but no concrete implementations.
 
-Its API isn't always the most convenient, and it lacks many conveniences and
-useful utilities that people commonly need.
+Its API isn't always the most convenient, and it lacks many creature comforts
+and useful utilities that people often need.
 
-Its 1 µs resolution is inadequate for some domains.
+And, its 1 µs resolution is inadequate for some domains.
 
-One approach address these is to use additional third-party libraries with
+One approach to address these is to use additional third-party libraries with
 datetime.
 
 ---
@@ -502,6 +510,8 @@ datetime.datetime(2017, 11, 26, 18, 1, 6, 620221,
           19:00:00 STD>)
 ```
 ???
+pytz is a third party time zone package.
+
 ...
 
 datetime.now() returns a naive datetime.  The time zone object has a localize
@@ -510,6 +520,31 @@ method that converts it to a localized datetime.
 With pytz, it's critical to use this localize method; you can't just stuff the
 time zone object into the datetime's tz field yourself.  You will get the
 wrong results!
+
+---
+class: advice, middle
+Time zones are complicated.  Use UTC as much as possible:
+
+- Use UTC localized datetimes.
+
+- Convert to other time zones only in UIs.
+
+```py
+>>> def now():
+...     return pytz.UTC.localize(datetime.utcnow())
+```
+```py
+>>> now()
+datetime.datetime(2017, 11, 27, 15, 11, 37, 42496, tzinfo=<UTC>)
+```
+???
+Recommendation: Use UTC as much as possible.
+
+Some people choose to use naive datetimes and just always store UTC.  IMO, this
+becomes confusing if you ever have to use localized datetimes for the UI, so I
+prefer datetimes explicitly localized to UTC.
+
+This is my preferred version of now().
 
 ---
 # datetime + [dateutil](https://dateutil.readthedocs.io/en/stable/)
@@ -532,12 +567,12 @@ dateutil is another package that provides time zone implementations.  By
 default, it uses your system's time zone database, but it also carries its own
 copy for use if needed.
 
-dateutil provides a convenient parser, which can usually figure out the format
-of a time string without being told.
+dateutil also provides a convenient time parser, which can usually figure out
+the format of a time string without being told.
 
 It also includes some recurrence / calendar functionality, which I won't get
 into here, plus calculation of Easter, which is a historically interesting
-problem.
+problem.  Check out the "computus" article on Wikipedia.
 
 ---
 # datetime + [Babel](http://babel.pocoo.org/en/latest/)
@@ -591,7 +626,7 @@ class: middle
 ???
 On to derivatives of datetime.
 
-There have been several attempts to improve datetime by wrapping or extending
+There have been several attempts to improve datetime by wrapping it or extending
 it.
 
 ---
@@ -641,7 +676,7 @@ But: Arrow also provides no date or time classes.
 ---
 - Well-designed convenience methods.
 ```py
->>> arrow.get(1511743679)        # epoch seconds
+>>> arrow.get(1511743679)                   # epoch seconds
 <Arrow [2017-11-27T00:47:59+00:00]>
 >>> t.replace(minute=30, second=0)
 <Arrow [2017-11-27T00:30:00+00:00]>
@@ -651,13 +686,13 @@ But: Arrow also provides no date or time classes.
 - Custom formatting and localization (50 languages).
 ```py
 >>> t.floor("month").humanize(locale="hi")
-'एक माह  पहले'                  # "one month ago"
+'एक माह  पहले'                               # "one month ago"
 ```
 ???
 You can convert epoch seconds and other values easily into Arrow instances.
 
 There are convenient methods to change fields, shift forward or backward
-by each time unit, to find round up or down by a time unit and so forth.
+by each time unit, to round up or down by a time unit, and so forth.
 
 It has a completely custom formatting implementation, with localization to 
 50 languages and also "humanize" formats.
@@ -673,8 +708,8 @@ An ambitious extension of datetime.
 ???
 An ambitious extension of datetime.
 
-It's the only extension package that provides dates and times as well.  With the
-others, you have to drop back into datetime to combine dates and times.
+It's the only extension package that provides a date type and a time of day type
+in addition to time.  
 
 Localized times only!
 
@@ -726,6 +761,8 @@ class: middle
 ???
 This is PyDATA!  One time value is not enough.  We want to store large
 datasets with times and dates in them.
+
+So let's consider the options.
 
 ---
 # [NumPy](https://docs.scipy.org/doc/numpy/reference/arrays.datetime.html)
@@ -832,33 +869,41 @@ This is an enhanced subclass of `datetime`:
 - adds a few convenience methods
 ???
 Also, Pandas provides a `Timestamp` class for single time values.  If you 
-extract a sigle value from a datetime index or series, Pandas wraps it for
+extract a single value from a datetime index or series, Pandas wraps it for
 you in this class.
 
 The `Timestamp` class is a subclass of datetime, but augments its resolution 
 to 1 ns and also adds the same convenience methods that the datetime index
 and series provide.
 
-Though not as many or well-designed methods as Pendulum.
+This provides some nice features, though not as many or well-designed methods as
+Pendulum.
 
 ---
 # Performance
 
-Standard datetime performs well for all operations.  In comparison,
+The standard library datetime package performs surprisingly well for all
+operations.
+
+In comparison,
 
 - Operations that udatetime provides are same or faster.
 
+- NumPy `datetime64` and Pandas `Timestamp` operations are similar or slower.
+
 - Delorean, Arrow, and Pendulum are a lot slower, often 20&times; or more.
 
-- NumPy and Pandas scalar operations are comparable or a bit slower.
+- Delorean is generally the slowest.
 
 - pytz is faster than dateutil for time zone operations.
 
 ???
-A quick word on performance.
+Those are major choices available to you.  
 
-I don't have time to present detailed performance results here, but here are
-some general results.
+We've discussed the features; now a quick word on performance.
+
+I don't have time to present detailed benchmarks, but here are some general
+results.
 
 ...
 
@@ -872,8 +917,8 @@ class: middle
 ???
 Now for the roundup.
 
-The GitHub repo also has a feature matrix which summarizes many of the facts
-above.
+I'll also note that the GitHub repo also has a feature matrix which summarizes
+many of the facts above.
 
 ---
 class: advice, middle
@@ -893,14 +938,16 @@ Delorean lags in features and performance.
 
 ---
 class: advice, middle
-For performance and compatibility, use datetime.
+For performance and compatibility, use datetime + pytz.
 ???
 ...
 
-The implementation is highly optimized.  The feature set is somewhat sparse;
-you'll almost certainly need additional packages to fill feature gaps:
+The implementation is highly optimized.  
 
-- Use pytz for time zones; but be careful of the API.
+The feature set is somewhat sparse; you'll almost certainly need additional
+packages to fill feature gaps:
+
+- Use pytz for time zones; though be careful to use the API correctly.
 - Use udatetime to accelerate some operations, most notably string parsing.
 - Use Babel and humanize if you need them for UIs.
 
