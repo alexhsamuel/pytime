@@ -14,9 +14,9 @@
 |formatting         |strftime|Babel   |custom  |strftime<br>custom|✘|strftime|
 |locales            |POSIX<sup>3</sup>|✘|custom|custom  |✘       |✘       |
 |humanizing         |✘       |✔       |✔       |✔       |✘       |✘       |
-|memory use<sup>4</sup>|40   |220     |512     |448     |40 (single)<br>8 (bulk)|120 (single)<br>8 (bulk)|
 |implementation     |C       |Python  |Python  |Python  |C       |Cython  |
-|interal repr       |components|`datetime`|`datetime`|`datetime`|ticks|`datetime`+ns|
+|internal repr      |components|`datetime`|`datetime`|`datetime`|ticks|`datetime`+ns|
+|memory use<sup>4</sup>|40   |220     |512     |448     |40 (single)<br>8 (bulk)|120 (single)<br>8 (bulk)|
 
 <sup>1</sup> For NumPy, we consider "datetime64[ns]" for times and "datetime64[D]" for dates.
 
