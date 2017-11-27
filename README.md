@@ -12,3 +12,8 @@ My evaluation of time and date representations in Python.
 
 - [PyData NYC 2017](https://alexhsamuel.github.io/pytime/talk/index.html)
 
+### Other
+
+See [cron](https://github.com/alexhsamuel/cron) for an alternate approache.
+(Work in progress.)
+
