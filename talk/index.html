@@ -127,7 +127,6 @@ class: center, middle
 <br><br>
 # It's about time!
 Alex Samuel
-<br><br><small>https://github.com/alexhsamuel/pytime</small>
 ???
 Hi!
 
@@ -340,6 +339,7 @@ Python.
 - string times and dates: 
     - `"2017-11-25"` 
     - `"2017-11-25T16:01:30+00:00"`
+
 - integer-encoded strings:
     - `20171125`
 
@@ -940,7 +940,10 @@ also [http://github.com/alexhsamuel/cron](http://github.com/alexhsamuel/cron)
     </textarea>
     <script src="remark-latest.min.js"></script>
     <script>
-      const slideshow = remark.create({ratio: '16:9'})
+      const slideshow = remark.create({
+        ratio: '16:9',
+      slideNumberFormat: '<span style="font-size: 50%;">https://github.com/alexhsamuel/pytime</span>&nbsp; %current%/%total%',
+      })
     </script>
   </body>
 </html>
