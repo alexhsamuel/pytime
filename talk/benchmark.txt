@@ -1,0 +1,53 @@
+get current UTC time
+  0.05 µs         null
+  0.13 µs =  1    datetime.utcnow
+  0.12 µs =  0.9  udatetime.utcnow
+  4.40 µs = 33.8  Delorean.utcnow
+  2.28 µs = 17.5  arrow.utcnow
+  7.22 µs = 55.4  pendulum.utcnow
+  0.33 µs =  2.5  ns.datetime64('now', 'ns')
+  5.03 µs = 38.6  pd.Timestamp.utcnow
+  0.12 µs =  0.9  cron.now
+
+convert time to string
+  0.12 µs         null
+  1.00 µs =  1    datetime.datetime.__str__
+  0.55 µs =  0.6  udatetime.to_string
+ 42.53 µs = 42.7  Delorean.format_datetime
+  1.87 µs =  1.9  Arrow.__str__
+  2.22 µs =  2.2  Pendulum.__str__
+  0.30 µs =  0.3  np.datetime64.__str__
+  2.94 µs =  3.0  pd.Timestamp.__str__
+  0.69 µs =  0.7  cron.Time.__str__
+
+convert from one time zone to another
+  0.12 µs         null
+  5.33 µs =  1    datetime.astimezone pytz
+ 21.04 µs =  3.9  datetime.astimezone dateutil.tz
+ 13.79 µs =  2.6  Delorean.shift
+ 21.41 µs =  4.0  Arrow.to pytz
+ 28.22 µs =  5.3  Arrow.to dateutil.tz
+ 15.13 µs =  2.8  Pendulum.in_timezone pytz
+  7.37 µs =  1.4  pd.Timestamp.astimezone pytz
+  7.75 µs =  1.5  pd.Timestamp.astimezone dateutil
+  0.33 µs =  0.1  cron.to_local
+  0.25 µs =  0.0  cron @
+
+get minute of local time
+  0.04 µs         null
+  0.07 µs =  1    datetime.minute
+  0.20 µs =  2.9  Delorean.datetime.minute
+  0.80 µs = 11.3  Arrow.minute
+  0.16 µs =  2.3  Pendulum.minute
+  0.08 µs =  1.1  Timestamp.minute
+  0.31 µs =  4.4  cron @ .daytime.minute
+
+parse UTC time
+ 13.69 µs =  1    datetime.strptime
+  0.98 µs =  0.1  udatetime.from_string
+112.37 µs =  8.2  delorean.parse
+ 72.37 µs =  5.3  arrow.get
+ 23.75 µs =  1.7  pendulum.from_format
+ 20.37 µs =  1.5  pendulum.strptime
+ 16.06 µs =  1.2  pendulum.parse
+
