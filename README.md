@@ -14,6 +14,6 @@ My evaluation of time and date representations in Python.
 
 ### Other
 
-See [cron](https://github.com/alexhsamuel/cron) for an alternate approache.
+See [ora](https://github.com/alexhsamuel/ora) for an alternate approache.
 (Work in progress.)
 
