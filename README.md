@@ -3,6 +3,7 @@ My evaluation of time and date representations in Python.
 ### Talks
 
 - [PyData NYC 2017](https://alexhsamuel.github.io/pytime/talks/pydata-nyc-2017/index.html)
+- [PyData NYC Meetup 2018-03-02](https://alexhsamuel.github.io/pytime/talks/2018-03-02/index.html)
 
 ### Writeup
 

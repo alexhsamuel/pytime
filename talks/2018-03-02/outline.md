@@ -1,0 +1,35 @@
+## Outline
+
+
+- Title
+- Goals
+    - "advice slides"
+- Who am I?
+- Preliminaries
+    - Time
+    - Date
+    - Time zones
+    - UTC
+    - Time formats
+- The Python packages
+    - primitive representations
+        - strings
+        - int encodings
+        - integer ticks
+    - datetime
+        - dateutil
+        - pytz
+        - Babel
+        - humanize
+    - datetime derivatives
+        - Delorean
+        - Arrow
+        - Pendulum
+    - times in datasets
+        - NumPy datetime64
+        - Pandas Timestamp
+    - feature summary
+    - benchmarks
+- Advice
+- Pitch: cron
+- Q&A
