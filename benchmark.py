@@ -8,7 +8,7 @@ import udatetime
 import delorean
 import arrow
 import pendulum
-import cron
+import ora
 
 def time(fn, label, samples=20, n=5000, quantile=0.05, unit=None):
     # Loop pedestal calculation.
@@ -67,7 +67,7 @@ if True:
 
     time(pd.Timestamp.utcnow, "pd.Timestamp.utcnow", unit=u)
 
-    time(cron.now, "cron.now", unit=u)
+    time(ora.now, "ora.now", unit=u)
 
     print()
 
@@ -104,9 +104,9 @@ if True:
     f = x.__str__
     time(lambda: f(), "pd.Timestamp.__str__", unit=u)
 
-    x = cron.now()
+    x = ora.now()
     f = x.__str__
-    time(lambda: f(), "cron.Time.__str__", unit=u)
+    time(lambda: f(), "ora.Time.__str__", unit=u)
 
     print()
 
@@ -162,14 +162,14 @@ if True:
     f = x.astimezone
     time(lambda: f(z1), "pd.Timestamp.astimezone dateutil", unit=u)
 
-    x = cron.now()
-    z = cron.TimeZone("Asia/Tokyo")
-    f = cron.to_local
-    time(lambda: f(x, z), "cron.to_local", unit=u)
+    x = ora.now()
+    z = ora.TimeZone("Asia/Tokyo")
+    f = ora.to_local
+    time(lambda: f(x, z), "ora.to_local", unit=u)
 
-    x = cron.now()
-    z = cron.TimeZone("Asia/Tokyo")
-    time(lambda: x @ z, "cron @", unit=u)
+    x = ora.now()
+    z = ora.TimeZone("Asia/Tokyo")
+    time(lambda: x @ z, "ora @", unit=u)
 
     print()
 
@@ -195,9 +195,9 @@ if True:
     x = pd.Timestamp.now("America/New_York")
     time(lambda: x.minute, "Timestamp.minute", unit=u)
 
-    x = cron.now()
-    z = cron.TimeZone("America/New_York")
-    time(lambda: (x @ z).daytime.minute, "cron @ .daytime.minute", unit=u)
+    x = ora.now()
+    z = ora.TimeZone("America/New_York")
+    time(lambda: (x @ z).daytime.minute, "ora @ .daytime.minute", unit=u)
 
     print()
 
