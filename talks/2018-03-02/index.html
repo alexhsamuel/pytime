@@ -132,8 +132,8 @@ Hi!
 
 I'm going to talk about times and dates in Python.
 
-This talk is on GitHub, with an accompanying writeup that contains additional
-details.  The writeup is still a work in progress, and I welcome your feedback.
+This talk is on GitHub.  There's a writeup, too, which is still a work in
+progress, and I welcome your feedback.
 
 ---
 # Goals
@@ -142,40 +142,35 @@ details.  The writeup is still a work in progress, and I welcome your feedback.
 - Discuss features, performance.
 
 ???
-I signed up to do this talk because there are a bewildering array of options
-for working with times and dates in Python.  I work with some of them on a 
-regular basis, but others I have used only occasionally or not at all.
+I signed up to do this talk at PyData NYC last year because there are a
+bewildering array of options for working with times and dates in Python.  I work
+with some of them on a regular basis, but others I have used only occasionally
+or not at all.
 
 In order to force myself to evaluate the choices currently out there,
 I submitted to do this talk.
 
-I'm warning you now, this will be the least sexy talk you attend today.  My goal
-is to bore you with gory details of dealing with times, dates, and time zones.
+It was a longer time slot, so I spent the last hour on the couch in the back
+deleting slides.
 
-I'll stick to civil time as is widely used in business, and won't go into leap
-seconds, relativistic effects, or astronomical time systems.
+This is not a tutorial!  This is a whirlwind tour, to help you to choose
+the best tools for your work.
 
-Also this is not a tutorial!  My intent is to help you to choose the best tools
-for your work.
+And I'm warning you now, this is not a sexy talk, and completely inappropriate
+for Friday at 8 PM.  But maybe it will help you on Monday morning.
 
 ---
+class: middle
+
 # Who am I?
-- Writing Python since version 1.4.
-- Used to work in high energy physics; now finance.
-- Write lots of date and time code.
 
 <svg class="octicon octicon-mark-github" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"></path></svg>
 <a href="https://github.com/alexhsamuel" style="font-size: 90%;">alexhsamuel</a>
 ???
-I've been writing Python code for a long time.  In the past, I worked in
+I've been writing Python code since Python 1.4.  In the past, I worked in
 physics, where I wrote lots of Python data handling code.  Now I work in
 finance, at Tudor Investment Corporation, where I write lots of Python data
 handling code.
-
-A lot of it involves times and dates, as you may imagine.
-
-My GitHub is alexhsamuel.  There you will find lots of languishing, uncompleted
-projects.  And this talk.
 
 ---
 class: middle
@@ -409,8 +404,8 @@ strptime functions.  They participate nicely with Python's string formatting.
 You can stuff the format pattern directly into the curly braces.
 
 Dates are fundamentally different objects, with different operations they can
-participate in.  You'll sometimes see dates represented as the time at midnight
-on that date.  Python gives you a real date type.  Use it.
+participate in.  Some people represents a date by the time at midnight on that
+date.  Please don't do that.  Python gives you a real date type.  Use it.
 
 ---
 # Shortcomings of datatime
@@ -683,9 +678,9 @@ If you use NumPy, you may be aware of the datetime64 dtype.
 This is a tick representation: internally, it stores an int64 containing the
 number of time units since the epoch.  
 
-There are many time units: days, seconds, ms, µs, ns.  There are even actually
-ps and fs as well, but the range of these is so small that they're virtually
-useless.
+There are a bunch of time units: days, seconds, ms, µs, ns.  There are even
+actually ps and fs as well, but the range of these is so small that they're
+virtually useless.
 
 This representation is commonly used in technical applications, particularly
 with ns.  So it's a natural fit for NumPy and easy to convert.
@@ -930,9 +925,9 @@ line.
 
 ---
 class: middle
-# Q&A
+# What time is it?
 ???
-Thank you!
+Beer o'clock!
 
 ---
     </textarea>
